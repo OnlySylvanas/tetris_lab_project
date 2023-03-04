@@ -1,0 +1,22 @@
+.playing-area {
+    display: grid;
+    grid-template-columns: 320px 200px;
+}
+
+.ui-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#board {
+    border: solid 3px;
+}
+
+.start-button {
+    background-color: #3def06;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px 20px;
+    font-weight: bold;
+}
