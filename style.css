@@ -1,3 +1,7 @@
+* {
+    font-size: 22px;
+}
+
 .playing-area {
     display: grid;
     grid-template-columns: 320px 200px;
@@ -22,6 +26,5 @@
 }
 
 #next_block_presenter {
-    border: solid 2px crimson;
     margin-bottom: 16px;
 }
