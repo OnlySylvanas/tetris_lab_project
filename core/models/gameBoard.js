@@ -94,4 +94,25 @@ class GameBoard {
 		piece.shape.forEach(row => row.reverse());
 		return piece;
 	}
+
+	pointInsideGamingBlock(x, y) {
+		return x >= 0 && x <= COLS && y <= ROWS;
+	}
+
+	pointIsFree(x, y) {
+		return this._grid[y] && this._grid[y][x] === 0;
+	}
+
+	validatePieceInfo(pieceInfo) {
+		return pieceInfo.shape.every((row, dy) => {
+			return row.every((value, dx) => {
+				let x = pieceInfo.x + dx;
+				let y = pieceInfo.y + dy;
+				return (
+					value === 0 ||
+					(this.pointInsideGamingBlock(x, y) && this.pointIsFree(x, y))
+				);
+			});
+		});
+	}
 }
