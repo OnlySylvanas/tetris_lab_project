@@ -1,5 +1,5 @@
-let gameBoard = document.getElementById('board');
-let gameBoardContext = gameBoard.getContext('2d');
+let boardPresenter = document.getElementById('board');
+let gameBoardContext = boardPresenter.getContext('2d');
 let nextBlockPresenter = document.getElementById('next_block_presenter');
 let nextBlockPresenterContext = nextBlockPresenter.getContext('2d');
 
@@ -29,13 +29,48 @@ let gameStateUpdateHook = new Proxy(gameState, {
 	}
 })
 
-let board = new GameBoard(gameBoardContext, nextBlockPresenterContext);
+moves = {
+	[KEY_CODES.LEFT]: p => ({ ...p, x: p.x - 1 }),
+	[KEY_CODES.RIGHT]: p => ({ ...p, x: p.x + 1 }),
+	[KEY_CODES.DOWN]: p => ({ ...p, y: p.y + 1 }),
+	[KEY_CODES.SPACE]: p => ({ ...p, y: p.y + 1 }),
+	[KEY_CODES.UP]: p => gameBoard.rotatePiece(p)
+};
+
+let gameBoard = new GameBoard(gameBoardContext, nextBlockPresenterContext);
 initializeNextBlockPresenter();
+addEventListeners();
 
 function initializeNextBlockPresenter() {
 	nextBlockPresenterContext.canvas.width = 4 * BLOCK_SIZE;
 	nextBlockPresenterContext.canvas.height = 4 * BLOCK_SIZE;
 	nextBlockPresenterContext.scale(BLOCK_SIZE, BLOCK_SIZE);
+}
+
+function addEventListeners() {
+	document.addEventListener('keydown', event => {
+		if (event.keyCode === KEY_CODES.P) {
+			pause();
+		}
+		if (event.keyCode === KEY_CODES.ESC) {
+			finishGame();
+		} else if (moves[event.keyCode]) {
+			event.preventDefault();
+			let pieceInfo = moves[event.keyCode](gameBoard.currentPiece);
+			if (event.keyCode === KEY_CODES.SPACE) {
+				while (gameBoard.validatePieceInfo(pieceInfo)) {
+					gameStateUpdateHook.score += REWARDS.HARD_DROP;
+					gameBoard.currentPiece.move(pieceInfo);
+					pieceInfo = moves[KEY_CODES.DOWN](gameBoard.currentPiece);
+				}
+			} else if (gameBoard.validatePieceInfo(pieceInfo)) {
+				gameBoard.currentPiece.move(pieceInfo);
+				if (event.keyCode === KEY_CODES.DOWN) {
+					gameStateUpdateHook.score += REWARDS.SOFT_DROP;
+				}
+			}
+		}
+	});
 }
 
 let requestId;
@@ -54,17 +89,44 @@ function resetGame() {
 	gameState.lines = 0;
 	gameTime.start = 0;
 	gameTime.elapsed = 0;
+	gameBoard.resetBoard();
 	gameTime.level = LEVELS[gameState.level];
 }
 
-function animate() {
-
+function animate(currentTick) {
+	gameTime.elapsed = currentTick - gameTime.start;
+	if (gameTime.elapsed > gameTime.level) {
+		gameTime.start = currentTick;
+		if (!gameBoard.dropPiece()) {
+			finishGame();
+			return;
+		}
+	}
+	gameBoardContext
+		.clearRect(0, 0, gameBoardContext.canvas.width, gameBoardContext.canvas.height);
+	gameBoard.drawCurrentBoardState();
+	requestId = requestAnimationFrame(animate);
 }
 
 function finishGame() {
-
+	cancelAnimationFrame(requestId);
+	showMessage("Конец игры");
 }
 
 function pause() {
+	if (!requestId) {
+		animate();
+		return;
+	}
+	cancelAnimationFrame(requestId);
+	requestId = null;
+	showMessage("Пауза")
+}
 
+function showMessage(message) {
+	gameBoardContext.fillStyle = 'black';
+	gameBoardContext.fillRect(1, 3, 8, 1.2);
+	gameBoardContext.font = '1px Arial';
+	gameBoardContext.fillStyle = 'lightgreen';
+	gameBoardContext.fillText(message, 3, 4);
 }

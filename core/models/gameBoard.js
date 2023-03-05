@@ -40,12 +40,50 @@ class GameBoard {
 		});
 	}
 
+	dropPiece() {
+		let pieceInfo = moves[KEY_CODES.DOWN](this.currentPiece);
+		if (this.validatePieceInfo(pieceInfo)) {
+			this.currentPiece.move(pieceInfo);
+		} else {
+			this.freezePiece();
+			this.clearLines();
+			if (this.currentPiece.y === 0)
+				return false;
+			this.currentPiece = this._nextPiece;
+			this.currentPiece.context = this._context;
+			this.currentPiece.setStartPosition();
+			this.createNewPiece();
+		}
+		return true;
+	}
+
+	clearLines() {
+		let lines = 0;
+		this._grid.forEach((row, y) => {
+			if (row.every(value => value > 0)) {
+				lines++;
+				this._grid.splice(y, 1);
+				this._grid.unshift(Array(COLS).fill(0));
+			}
+		});
+		if (lines > 0) {
+			gameStateUpdateHook.score += this.calculatePointsForClearedLines(lines);
+			gameStateUpdateHook.lines += lines;
+			if (gameStateUpdateHook.lines >= LINES_PER_LEVEL) {
+				gameStateUpdateHook.level++;
+				gameStateUpdateHook.lines -= LINES_PER_LEVEL;
+				// Увеличиваем скорость
+				gameTime.level = LEVELS[gameStateUpdateHook.level];
+			}
+		}
+	}
+
 	createNewPiece() {
-		this._nextPiece = new Piece(this._context);
+		this._nextPiece = new Piece(this._nextBlockPresenterContext);
 		this._nextBlockPresenterContext
 			.clearRect(0, 0,
-				this._nextBlockPresenterContext.width,
-				this._nextBlockPresenterContext.height
+				this._nextBlockPresenterContext.canvas.width,
+				this._nextBlockPresenterContext.canvas.height
 			);
 		this._nextPiece.draw();
 	}

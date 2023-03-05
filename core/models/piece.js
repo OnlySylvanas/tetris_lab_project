@@ -24,7 +24,7 @@ class Piece {
 		this.shape.forEach((row, y) => {
 			row.forEach((value, x) => {
 				if (value > 0) {
-					this._color.fillRect(this.x + x, this.y + y, 1, 1);
+					this.context.fillRect(this.x + x, this.y + y, 1, 1);
 				}
 			});
 		});
