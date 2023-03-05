@@ -1,9 +1,39 @@
 'use strict';
 
+/**
+ * Количество столбцов в игровом поле (его ширина)
+ *
+ * @const {number}
+ */
 const COLS = 10;
+
+/**
+ * Количество строк в игровом поле (его высота)
+ *
+ * @const {number}
+ */
 const ROWS = 20;
+
+/**
+ * Размер фигурки
+ *
+ * @const {number}
+ */
 const BLOCK_SIZE = 30;
+
+/**
+ * Количество строк, которые необходимо закрыть
+ * для прохождения 1-го уровня
+ *
+ * @const {number}
+ */
 const LINES_PER_LEVEL = 10;
+
+/**
+ * Доступные цвета фигурок
+ *
+ * @const {Array}
+ */
 const PIECE_COLORS = [
     'none',
     'cyan',
@@ -16,6 +46,11 @@ const PIECE_COLORS = [
 ];
 Object.freeze(PIECE_COLORS);
 
+/**
+ * Доступные формы фигурок
+ *
+ * @const {Array}
+ */
 const PIECE_SHAPES = [
     [],
     [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
@@ -28,6 +63,11 @@ const PIECE_SHAPES = [
 ]
 Object.freeze(PIECE_SHAPES);
 
+/**
+ * Коды используемых клавиш
+ *
+ * @const {Array}
+ */
 const KEY_CODES = {
     ESC: 27,
     SPACE: 32,
@@ -39,6 +79,11 @@ const KEY_CODES = {
 };
 Object.freeze(KEY_CODES);
 
+/**
+ * Виды наград
+ *
+ * @const {Array}
+ */
 const REWARDS = {
     SINGLE: 100,
     DOUBLE: 300,
@@ -49,6 +94,11 @@ const REWARDS = {
 };
 Object.freeze(REWARDS);
 
+/**
+ * Уровни вместе с соответствующими им скоростями обновления (в мс)
+ *
+ * @const {Array}
+ */
 const LEVELS = {
     0: 800,
     1: 720,
